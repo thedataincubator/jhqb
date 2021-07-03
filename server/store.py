@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field, is_dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-import json
 import uuid
 
 @dataclass
@@ -15,17 +14,6 @@ class Question:
     id: str = field(default_factory=lambda: uuid.uuid4().hex)
 
 
-class QuestionEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, set):
-            return tuple(obj)
-        if is_dataclass(obj):
-            return asdict(obj)
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        return super().default(obj)
-
-
 class QuestionsStore:
     def __init__(self):
         self._questions = dict()
@@ -35,10 +23,7 @@ class QuestionsStore:
         self._questions[q.id] = q
 
     def get_questions(self):
-        return self._questions.values()
-
-    def get_questions_json(self):
-        return json.dumps([asdict(q) for q in self.get_questions()], cls=QuestionEncoder)
+        return list(self._questions.values())
 
     def add_vote(self, qid, voter):
         q = self._questions[qid]

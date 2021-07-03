@@ -1,6 +1,14 @@
-from flask import Flask, request
+from flask import Flask, json, request
 
 from store import QuestionsStore
+
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return tuple(obj)
+        return super().default(obj)
+
+Flask.json_encoder = SetEncoder
 
 app = Flask(__name__)
 questions_store = QuestionsStore()
@@ -11,7 +19,7 @@ def index():
 
 @app.route('/questions', methods=['GET'])
 def questions():
-    return questions_store.get_questions_json()
+    return json.jsonify(questions_store.get_questions())
 
 @app.route('/question', methods=['POST'])
 def question():
@@ -21,6 +29,11 @@ def question():
         return "Error", 400
     questions_store.add_vote(qid, user)
     return "OK"
+
+@app.after_request
+def after_request(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 if __name__ == '__main__':
     questions_store.add_question("What?", "me")
