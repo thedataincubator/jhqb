@@ -9,7 +9,7 @@
   $: createDate = new Date(created)
 </script>
 
-<div class="question">
+<div class="question" id="{id}">
   <div class="votes">
     <button class="upvote">+1</button>
     <div class="count">+{votes.length}</div>

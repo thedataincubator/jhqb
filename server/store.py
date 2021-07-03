@@ -21,6 +21,7 @@ class QuestionsStore:
     def add_question(self, text, creator):
         q = Question(text, creator)
         self._questions[q.id] = q
+        return q
 
     def get_questions(self):
         return list(self._questions.values())
