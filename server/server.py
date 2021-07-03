@@ -53,6 +53,24 @@ def vote_m(user, qid):
         return "OK"
     return "Error", 500
 
+@app.route('/close/<qid>', methods=['POST'])
+@authenticated
+def close(user, qid):
+    q = questions_store.get_question(qid)
+    if q and (q.creator == user['name'] or user['admin']):
+        questions_store.close(qid)
+        return "OK"
+    return "Permission Denied", 403
+
+@app.route('/open/<qid>', methods=['POST'])
+@authenticated
+def open(user, qid):
+    q = questions_store.get_question(qid)
+    if q and (q.creator == user['name'] or user['admin']):
+        questions_store.open(qid)
+        return "OK"
+    return "Permission Denied", 403
+
 @app.after_request
 def after_request(response):
     response.headers['Access-Control-Allow-Origin'] = '*'

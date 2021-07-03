@@ -2,7 +2,20 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from functools import wraps
 import uuid
+
+def with_question(func):
+    @wraps(func)
+    def decorated(self, qid, *args, **kw):
+        try:
+            q = self._questions[qid]
+        except KeyError:
+            return False
+        func(self, q, *args, **kw)
+        return True
+    return decorated
+
 
 @dataclass
 class Question:
@@ -26,18 +39,21 @@ class QuestionsStore:
     def get_questions(self):
         return list(self._questions.values())
 
-    def add_vote(self, qid, voter):
-        try:
-            q = self._questions[qid]
-        except KeyError:
-            return False
-        q.votes.add(voter)
-        return True
+    def get_question(self, qid):
+        return self._questions.get(qid)
 
-    def remove_vote(self, qid, voter):
-        try:
-            q = self._questions[qid]
-        except KeyError:
-            return False
+    @with_question
+    def add_vote(self, q, voter):
+        q.votes.add(voter)
+
+    @with_question
+    def remove_vote(self, q, voter):
         q.votes.discard(voter)
-        return True
+
+    @with_question
+    def close(self, q):
+        q.closed = True
+
+    @with_question
+    def open(self, q):
+        q.closed = False

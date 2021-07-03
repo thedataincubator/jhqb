@@ -11,19 +11,25 @@
   $: votedFor = (votes.indexOf(jhdata.user) > -1)
 
   const queryClient = useQueryClient()
-  const mutation = useMutation(async (vote) => {
+  const voteMutation = useMutation(async (vote) => {
     const url = `http://localhost:8000/vote/${id}/${vote}`
-    const response = await fetch(url, {
-      method: 'POST'
-    })
+    const response = await fetch(url, {method: 'POST'})
     if (!response.ok) {
       throw new Error('Failure to update vote')
     }
     // Don't worry about syncing state on votes.
   })
+  const closeMutation = useMutation(async (which) => {
+    const url = `http://localhost:8000/${which}/${id}`
+    const response = await fetch(url, {method: 'POST'})
+    if (!response.ok) {
+      throw new Error('Failure to change closed status')
+    }
+    // Don't worry about syncing state on closes.
+  })
 
   function toggleVote() {
-    $mutation.mutate(votedFor ? '-' : '+')
+    $voteMutation.mutate(votedFor ? '-' : '+')
     queryClient.setQueryData('questions', (data) => {
       for (let question of data) {
         if (question.id === id) {
@@ -37,9 +43,26 @@
       return data
     })
   }
+
+  function toggleClose() {
+    $closeMutation.mutate(closed ? 'open': 'close')
+    queryClient.setQueryData('questions', (data) => {
+      for (let question of data) {
+        if (question.id === id) {
+          question.closed = !closed
+        }
+      }
+      return data
+    })
+  }
 </script>
 
 <div class="question" id="{id}">
+  {#if jhdata['user'] === creator || jhdata['admin_access']}
+    <button class="close" class:closed on:click={toggleClose}>
+      {closed ? '⟲' : '✖'}
+    </button>
+  {/if}
   <div class="votes">
     <button class="upvote" class:votedFor on:click={toggleVote}>👍</button>
     <div class="count">+{votes.length}</div>
@@ -52,6 +75,7 @@
 
 <style>
   div.question {
+    position: relative;
     margin: 1em;
     border: thin solid #ddd;
     border-radius: 0.5em;
@@ -77,6 +101,27 @@
   }
   button.upvote:hover {
     border-color: #9cf;
+  }
+
+  button.close {
+    display: none;
+    position: absolute;
+    right: -0.5em;
+    top: -0.5em;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 100%;
+    background-color: #f66;
+    color: white;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+  }
+  button.close.closed {
+    background-color: #6c6;
+  }
+  div.question:hover button.close {
+    display: flex;
   }
 
   div.meta {
