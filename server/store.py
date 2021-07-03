@@ -9,7 +9,7 @@ class Question:
     text: str
     creator: str
     votes: set[str] = field(default_factory=set)
-    created: datetime = field(default_factory=datetime.now)
+    created: datetime = field(default_factory=datetime.utcnow)
     closed: bool = False
     id: str = field(default_factory=lambda: uuid.uuid4().hex)
 
