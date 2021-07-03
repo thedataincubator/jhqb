@@ -13,12 +13,33 @@
   const queryResult = useQuery('questions', fetchQuestions)
 </script>
 
-{#if $queryResult.isLoading}
-  <span>Loading...</span>
-{:else if $queryResult.error}
-  <span>Error: {$queryResult.error.message}</span>
-{:else}
-  {#each $queryResult.data as question}
-    <Question {...question} />
-  {/each}
-{/if}
+<div>
+  {#if $queryResult.isLoading}
+    <span>Loading...</span>
+  {:else if $queryResult.error}
+    <span>Error: {$queryResult.error.message}</span>
+  {:else}
+    {#each $queryResult.data as question}
+      <Question {...question} />
+    {/each}
+  {/if}
+</div>
+
+<style>
+  div {
+    margin: auto;
+    border: thin solid #ddd;
+    border-radius: 0.5em;
+    background-color: #eee;
+    max-width: 75ex;
+    height: 80vh;
+  }
+
+  span {
+    display: block;
+    width: 100%;
+    margin-top: 20vh;
+    text-align: center;
+    font-size: larger;
+  }
+</style>
