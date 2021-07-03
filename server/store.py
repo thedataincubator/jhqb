@@ -39,5 +39,5 @@ class QuestionsStore:
             q = self._questions[qid]
         except KeyError:
             return False
-        q.votes.remove(voter)
+        q.votes.discard(voter)
         return True
