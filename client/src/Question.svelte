@@ -1,5 +1,5 @@
 <script>
-  import { useMutation } from '@sveltestack/svelte-query'
+  import { useMutation, useQueryClient } from '@sveltestack/svelte-query'
   export let text
   export let creator
   export let created
@@ -10,6 +10,7 @@
   $: createDate = new Date(created)
   $: votedFor = (votes.indexOf(jhdata.user) > -1)
 
+  const queryClient = useQueryClient()
   const mutation = useMutation(async (vote) => {
     const url = `http://localhost:8000/vote/${id}/${vote}`
     const response = await fetch(url, {
@@ -23,12 +24,18 @@
 
   function toggleVote() {
     $mutation.mutate(votedFor ? '-' : '+')
-    if (!votedFor) {
-      // Assignment to trigger update
-      votes = [...votes, jhdata.user]
-    } else {
-      votes = votes.filter(user => user !== jhdata.user)
-    }
+    queryClient.setQueryData('questions', (data) => {
+      for (let question of data) {
+        if (question.id === id) {
+          if (!votedFor) {
+            question.votes.push(jhdata.user)
+          } else {
+            question.votes = question.votes.filter(u => u !== jhdata.user)
+          }
+        }
+      }
+      return data
+    })
   }
 </script>
 
