@@ -39,14 +39,19 @@ def question(user):
     q = questions_store.add_question(text, user['name'])
     return q.id
 
-@app.route('/vote', methods=['POST'])
+@app.route('/vote/<qid>/+', methods=['POST'])
 @authenticated
-def vote(user):
-    qid = request.form.get('qid')
-    if not qid:
-        return "Error", 400
-    questions_store.add_vote(qid, user['name'])
-    return "OK"
+def vote_p(user, qid):
+    if questions_store.add_vote(qid, user['name']):
+        return "OK"
+    return "Error", 500
+
+@app.route('/vote/<qid>/-', methods=['POST'])
+@authenticated
+def vote_m(user, qid):
+    if questions_store.remove_vote(qid, user['name']):
+        return "OK"
+    return "Error", 500
 
 @app.after_request
 def after_request(response):

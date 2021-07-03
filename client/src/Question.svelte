@@ -1,4 +1,5 @@
 <script>
+  import { useMutation } from '@sveltestack/svelte-query'
   export let text
   export let creator
   export let created
@@ -7,11 +8,33 @@
   export let closed
 
   $: createDate = new Date(created)
+  $: votedFor = (votes.indexOf(jhdata.user) > -1)
+
+  const mutation = useMutation(async (vote) => {
+    const url = `http://localhost:8000/vote/${id}/${vote}`
+    const response = await fetch(url, {
+      method: 'POST'
+    })
+    if (!response.ok) {
+      throw new Error('Failure to update vote')
+    }
+    // Don't worry about syncing state on votes.
+  })
+
+  function toggleVote() {
+    $mutation.mutate(votedFor ? '-' : '+')
+    if (!votedFor) {
+      // Assignment to trigger update
+      votes = [...votes, jhdata.user]
+    } else {
+      votes = votes.filter(user => user !== jhdata.user)
+    }
+  }
 </script>
 
 <div class="question" id="{id}">
   <div class="votes">
-    <button class="upvote">+1</button>
+    <button class="upvote" class:votedFor on:click={toggleVote}>👍</button>
     <div class="count">+{votes.length}</div>
   </div>
   <div class="text">{text}</div>
@@ -34,6 +57,19 @@
     text-align: center;
     padding-left: 0.5em;
     background-color: white;
+  }
+
+  button.upvote {
+    border-radius: 100%;
+    background-color: #def;
+    filter: grayscale(1.0);
+    cursor: pointer;
+  }
+  button.upvote:hover, button.upvote.votedFor {
+    filter: grayscale(0.0);
+  }
+  button.upvote:hover {
+    border-color: #9cf;
   }
 
   div.meta {

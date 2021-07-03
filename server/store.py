@@ -27,9 +27,17 @@ class QuestionsStore:
         return list(self._questions.values())
 
     def add_vote(self, qid, voter):
-        q = self._questions[qid]
+        try:
+            q = self._questions[qid]
+        except KeyError:
+            return False
         q.votes.add(voter)
+        return True
 
     def remove_vote(self, qid, voter):
-        q = self._questions[qid]
+        try:
+            q = self._questions[qid]
+        except KeyError:
+            return False
         q.votes.remove(voter)
+        return True
