@@ -1,5 +1,8 @@
 <script>
   import { useMutation, useQueryClient } from '@sveltestack/svelte-query'
+  import marked from 'marked'
+  import DOMPurify from 'dompurify'
+
   export let text
   export let creator
   export let created
@@ -68,7 +71,7 @@
     <button class="upvote" class:votedFor on:click={toggleVote}>👍</button>
     <div class="count">+{votes.length}</div>
   </div>
-  <div class="text">{text}</div>
+  <div class="text">{@html DOMPurify.sanitize(marked(text))}</div>
   <div class="meta">
     Asked by {creator.split('@')[0]} on {createDate.toDateString()}.
   </div>
@@ -82,6 +85,13 @@
     border-radius: 0.5em;
     padding: 1em;
     background-color: white;
+  }
+
+  div.text > :global(:first-child) {
+    margin-top: 0;
+  }
+  div.text > :global(:last-child) {
+    margin-bottom: 0;
   }
 
   div.votes {

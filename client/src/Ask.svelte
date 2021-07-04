@@ -15,6 +15,7 @@
 
   export let scrollId = null
   let question = ''
+  const questionLimit = 2048
   const queryClient = useQueryClient()
   const mutation = useMutation(postQuestion, {
     onSuccess: async (data) => {
@@ -33,13 +34,21 @@
       Error submitting question: {$mutation.error.message}
     </div>
   {/if}
-  <textarea name="question" bind:value={question} disabled={disabled}></textarea>
-  <button type="submit" disabled={disabled || !question}>Ask!</button>
+  <div class="entry">
+    <textarea name="question" bind:value={question} disabled={disabled} placeholder="Markdown accepted"></textarea>
+    <button type="submit" disabled={disabled || !question || question.length > questionLimit}>Ask!</button>
+  </div>
+  {#if question.length > questionLimit}
+    <div class="error">Questions are limited to {questionLimit} characters.</div>
+  {/if}
 </form>
 
 <style>
   form {
     padding: 1em;
+  }
+
+  div.entry {
     display:flex;
   }
 

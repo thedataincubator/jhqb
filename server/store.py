@@ -5,6 +5,8 @@ from datetime import datetime
 from functools import wraps
 import uuid
 
+QUESTION_LIMIT = 2048
+
 def with_question(func):
     @wraps(func)
     def decorated(self, qid, *args, **kw):
@@ -32,7 +34,7 @@ class QuestionsStore:
         self._questions = dict()
 
     def add_question(self, text, creator):
-        q = Question(text, creator)
+        q = Question(text[:QUESTION_LIMIT], creator)
         self._questions[q.id] = q
         return q
 
