@@ -74,7 +74,7 @@
   </div>
   <div class="text">{text}</div>
   <div class="meta">
-    Asked by {creator} on {createDate.toDateString()}.
+    Asked by {creator.split('@')[0]} on {createDate.toDateString()}.
   </div>
 </div>
 
