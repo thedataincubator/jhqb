@@ -63,7 +63,8 @@
 
 <div class="question" id="{id}">
   {#if jhdata['user'] === creator || jhdata['admin_access']}
-    <button class="close" class:closed on:click={toggleClose}>
+    <button class="close" class:closed on:click={toggleClose}
+            title={closed ? "Re-open" : "Close"}>
       {closed ? '⟲' : '✖'}
     </button>
   {/if}
