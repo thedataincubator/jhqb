@@ -85,7 +85,7 @@
   {:else if $queryResult.error}
     <span class="message">Error: {$queryResult.error.message}</span>
   {:else}
-    {#each $queryResult.data.filter(filterQuestions).sort(sortQuestions) as question}
+    {#each $queryResult.data.filter(filterQuestions).sort(sortQuestions) as question (question.id)}
       <Question {...question} />
     {/each}
   {/if}

@@ -11,11 +11,7 @@
   $: votedFor = (votes.indexOf(jhdata.user) > -1)
 
   const queryClient = useQueryClient()
-  // These objects appear to be reused, and the mutations don't get
-  // regenerated as the id changes.  Therefore, we need to be sure to
-  // pass the id in as an argument, so that we get the current id, not
-  // the id from when the object was first created.
-  const voteMutation = useMutation(async ({ vote, id }) => {
+  const voteMutation = useMutation(async (vote) => {
     const url = `http://localhost:8000/vote/${id}/${vote}`
     const response = await fetch(url, {method: 'POST'})
     if (!response.ok) {
@@ -23,7 +19,7 @@
     }
     // Don't worry about syncing state on votes.
   })
-  const closeMutation = useMutation(async ({ which, id }) => {
+  const closeMutation = useMutation(async (which) => {
     const url = `http://localhost:8000/${which}/${id}`
     const response = await fetch(url, {method: 'POST'})
     if (!response.ok) {
@@ -33,7 +29,7 @@
   })
 
   function toggleVote() {
-    $voteMutation.mutate({vote: votedFor ? '-' : '+', id: id})
+    $voteMutation.mutate(votedFor ? '-' : '+')
     queryClient.setQueryData('questions', (data) => {
       for (let question of data) {
         if (question.id === id) {
@@ -49,7 +45,7 @@
   }
 
   function toggleClose() {
-    $closeMutation.mutate({which: closed ? 'open': 'close', id: id})
+    $closeMutation.mutate(closed ? 'open': 'close')
     queryClient.setQueryData('questions', (data) => {
       for (let question of data) {
         if (question.id === id) {
