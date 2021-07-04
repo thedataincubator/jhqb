@@ -34,17 +34,25 @@
     </div>
   {/if}
   <textarea name="question" bind:value={question} disabled={disabled}></textarea>
-  <button type="submit" disabled={disabled}>Ask!</button>
+  <button type="submit" disabled={disabled || !question}>Ask!</button>
 </form>
 
 <style>
   form {
     padding: 1em;
+    display:flex;
   }
 
   textarea {
-    width: 80%;
     height: 4em;
+    resize: vertical;
+    flex-grow: 1;
+    border-radius: 0.5em 0 0 0.5em;
+  }
+
+  button {
+    border-radius: 0 0.5em 0.5em 0;
+    border-left: none;
   }
 
   div.error {
