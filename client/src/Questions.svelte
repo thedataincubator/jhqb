@@ -15,6 +15,7 @@
   let scrollId = null
   let sortVal = 'date'
   let sortDir = +1
+  let showClosed = false
   const queryResult = useQuery('questions', fetchQuestions)
 
   // Mark as reactive so sort is recalculated when variables change
@@ -24,6 +25,7 @@
                 : a.votes.length - b.votes.length)
     return sortDir * diff
   }
+  $: filterQuestions = (q) => q.closed == showClosed
 
   afterUpdate(() => {
     if (scrollId !== null) {
@@ -39,7 +41,6 @@
 
 <div class="options">
   <span class="sort">
-    Sort by
     <button
       on:click={() => {
         if (sortVal !== 'date') {
@@ -49,6 +50,7 @@
           sortDir = -sortDir
         }
       }}
+      class="withSort"
       class:sortUp={sortVal === 'date' && sortDir === 1}
       class:sortDown={sortVal === 'date' && sortDir === -1}
     >Date</button>
@@ -61,9 +63,20 @@
           sortDir = -sortDir
         }
       }}
+      class="withSort"
       class:sortUp={sortVal === 'votes' && sortDir === 1}
       class:sortDown={sortVal === 'votes' && sortDir === -1}
     >Votes</button>
+  </span>
+  <span class="filter">
+    <button
+      on:click={() => {showClosed = false}}
+      class:active={!showClosed}
+    >Open</button>
+    <button
+      on:click={() => {showClosed = true}}
+      class:active={showClosed}
+    >Closed</button>
   </span>
 </div>
 <div class="questions">
@@ -72,7 +85,7 @@
   {:else if $queryResult.error}
     <span class="message">Error: {$queryResult.error.message}</span>
   {:else}
-    {#each $queryResult.data.sort(sortQuestions) as question}
+    {#each $queryResult.data.filter(filterQuestions).sort(sortQuestions) as question}
       <Question {...question} />
     {/each}
   {/if}
@@ -92,6 +105,8 @@
   div.options {
     border-radius: 0.5em 0.5em 0 0 ;
     border-bottom: none;
+    display: flex;
+    justify-content: space-between;
   }
   div.options * {
     font-size: small;
@@ -116,10 +131,6 @@
     font-size: larger;
   }
 
-  span.sort {
-    margin-left: 1.3em;
-  }
-
   button {
     margin: 0;
     background-color: #eee;
@@ -129,11 +140,11 @@
     cursor: pointer;
   }
 
-  button.sortUp, button.sortDown {
+  button.sortUp, button.sortDown, button.active {
     background-color: #ddd;
   }
 
-  button::after {
+  button.withSort::after {
     display: inline-block;
     width: 1ex;
     padding-left: 1ex;
