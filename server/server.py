@@ -1,4 +1,4 @@
-from flask import Flask, json, request
+from flask import Flask, json, render_template, request
 from functools import wraps
 
 from store import QuestionsStore
@@ -11,7 +11,9 @@ class SetEncoder(json.JSONEncoder):
 
 Flask.json_encoder = SetEncoder
 
-app = Flask(__name__)
+app = Flask(__name__,
+            template_folder='../client/templates',
+            static_folder='../client/public', static_url_path='/')
 questions_store = QuestionsStore()
 
 def authenticated(func):
@@ -22,8 +24,9 @@ def authenticated(func):
     return decorated
 
 @app.route('/')
-def index():
-    return "Hello"
+@authenticated
+def index(user):
+    return render_template('index.html', name=user['name'], admin=user['admin'])
 
 @app.route('/questions', methods=['GET'])
 @authenticated
