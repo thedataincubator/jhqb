@@ -15,7 +15,7 @@
 
   const queryClient = useQueryClient()
   const voteMutation = useMutation(async (vote) => {
-    const url = `http://localhost:8000/vote/${id}/${vote}`
+    const url = `${jhdata.prefix}vote/${id}/${vote}`
     const response = await fetch(url, {method: 'POST'})
     if (!response.ok) {
       throw new Error('Failure to update vote')
@@ -23,7 +23,7 @@
     // Don't worry about syncing state on votes.
   })
   const closeMutation = useMutation(async (which) => {
-    const url = `http://localhost:8000/${which}/${id}`
+    const url = `${jhdata.prefix}${which}/${id}`
     const response = await fetch(url, {method: 'POST'})
     if (!response.ok) {
       throw new Error('Failure to change closed status')

@@ -2,7 +2,7 @@
   import { useMutation, useQueryClient } from '@sveltestack/svelte-query'
 
   async function postQuestion(question) {
-    const response = await fetch('http://localhost:8000/question', {
+    const response = await fetch(`${jhdata.prefix}question`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({question: question})
@@ -27,8 +27,7 @@
   $: disabled = $mutation.isLoading ? "disabled" : ""
 </script>
 
-<form action="http://localhost:8000/question" method="POST"
-      on:submit|preventDefault={() => $mutation.mutate(question)}>
+<form on:submit|preventDefault={() => $mutation.mutate(question)}>
   {#if $mutation.isError}
     <div class="error">
       Error submitting question: {$mutation.error.message}

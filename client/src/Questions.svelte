@@ -5,7 +5,7 @@
   import Ask from './Ask.svelte'
 
   async function fetchQuestions() {
-    const response = await fetch('http://localhost:8000/questions')
+    const response = await fetch(`${jhdata.prefix}questions`)
     if (!response.ok) {
       throw new Error('Failure to fetch questions')
     }

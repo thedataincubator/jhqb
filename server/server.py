@@ -1,5 +1,6 @@
 from flask import Flask, json, render_template, request
 from functools import wraps
+import os
 
 from store import QuestionsStore
 
@@ -11,10 +12,15 @@ class SetEncoder(json.JSONEncoder):
 
 Flask.json_encoder = SetEncoder
 
+prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '/')
+
 app = Flask(__name__,
             template_folder='../client/templates',
             static_folder='../client/public', static_url_path='/')
 questions_store = QuestionsStore()
+
+def route(path, *args, **kw):
+    return app.route(prefix + path, *args, **kw)
 
 def authenticated(func):
     """This will hook into the JH auth, returning an error if not logged in."""
@@ -23,17 +29,18 @@ def authenticated(func):
         return func({'name': 'me@example.com', 'admin': False}, *args, **kw)
     return decorated
 
-@app.route('/')
+@route('')
 @authenticated
 def index(user):
-    return render_template('index.html', name=user['name'], admin=user['admin'])
+    return render_template('index.html', name=user['name'],
+                           admin=user['admin'], prefix=prefix)
 
-@app.route('/questions', methods=['GET'])
+@route('questions', methods=['GET'])
 @authenticated
 def questions(user):
     return json.jsonify(questions_store.get_questions())
 
-@app.route('/question', methods=['POST'])
+@route('question', methods=['POST'])
 @authenticated
 def question(user):
     text = request.get_json().get('question')
@@ -42,21 +49,21 @@ def question(user):
     q = questions_store.add_question(text, user['name'])
     return q.id
 
-@app.route('/vote/<qid>/+', methods=['POST'])
+@route('vote/<qid>/+', methods=['POST'])
 @authenticated
 def vote_p(user, qid):
     if questions_store.add_vote(qid, user['name']):
         return "OK"
     return "Error", 500
 
-@app.route('/vote/<qid>/-', methods=['POST'])
+@route('vote/<qid>/-', methods=['POST'])
 @authenticated
 def vote_m(user, qid):
     if questions_store.remove_vote(qid, user['name']):
         return "OK"
     return "Error", 500
 
-@app.route('/close/<qid>', methods=['POST'])
+@route('close/<qid>', methods=['POST'])
 @authenticated
 def close(user, qid):
     q = questions_store.get_question(qid)
@@ -65,7 +72,7 @@ def close(user, qid):
         return "OK"
     return "Permission Denied", 403
 
-@app.route('/open/<qid>', methods=['POST'])
+@route('open/<qid>', methods=['POST'])
 @authenticated
 def open(user, qid):
     q = questions_store.get_question(qid)

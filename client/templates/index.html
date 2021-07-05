@@ -12,7 +12,8 @@
   <script>
     const jhdata = {
       user: {{ name | tojson }},
-      admin_access: {{ admin | tojson}}
+      admin_access: {{ admin | tojson }},
+      prefix: {{ prefix | tojson }}
     }
   </script>
   <script defer src='/build/bundle.js'></script>
