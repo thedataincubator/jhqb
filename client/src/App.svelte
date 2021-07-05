@@ -6,6 +6,5 @@
 </script>
 
 <QueryClientProvider client={queryClient}>
-  <h1>Questions</h1>
   <Questions />
 </QueryClientProvider>

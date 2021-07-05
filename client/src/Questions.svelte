@@ -98,10 +98,8 @@
 
 <style>
   div {
-    margin: auto;
     border: thin solid #ddd;
     background-color: #eee;
-    max-width: 75ex;
   }
 
   div.options {
@@ -116,7 +114,7 @@
   }
 
   div.questions {
-    height: 70vh;
+    flex-grow: 1;
     overflow-y: auto;
   }
 
