@@ -1,5 +1,6 @@
 from flask import Flask, json, render_template, request
 from functools import wraps
+from jupyterhub.services.auth import HubAuth
 import os
 
 from store import QuestionsStore
@@ -13,10 +14,13 @@ class SetEncoder(json.JSONEncoder):
 Flask.json_encoder = SetEncoder
 
 prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '/')
+auth = HubAuth(api_token=os.environ['JUPYTERHUB_API_TOKEN'],
+               api_url=os.environ['JUPYTERHUB_API_URL'],
+               cache_max_age=60)
 
 app = Flask(__name__,
             template_folder='../client/templates',
-            static_folder='../client/public', static_url_path='/')
+            static_folder='../client/public', static_url_path=prefix)
 questions_store = QuestionsStore()
 
 def route(path, *args, **kw):
@@ -26,7 +30,12 @@ def authenticated(func):
     """This will hook into the JH auth, returning an error if not logged in."""
     @wraps(func)
     def decorated(*args, **kw):
-        return func({'name': 'me@example.com', 'admin': False}, *args, **kw)
+        cookie = request.cookies.get(auth.cookie_name)
+        if cookie:
+            user = auth.user_for_cookie(cookie)
+            if user:
+                return func(user, *args, **kw)
+        return "Permission Denied", 403
     return decorated
 
 @route('')
@@ -86,8 +95,3 @@ def after_request(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = '*'
     return response
-
-if __name__ == '__main__':
-    questions_store.add_question("What?", "me")
-    questions_store.add_question("Huh?", "you")
-    app.run(port=8000, debug=True)
