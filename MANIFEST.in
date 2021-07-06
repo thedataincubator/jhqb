@@ -1,0 +1,2 @@
+graft server/jhqb/public.dir
+graft server/jhqb/templates.dir

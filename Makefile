@@ -1,6 +1,9 @@
-.PHONY: svelte
+.PHONY: svelte wheel
 
 svelte: server/jhqb/*.dir
+
+wheel: svelte
+	python -m build
 
 # Deep magic to make this search all subfolders.  See
 # https://stackoverflow.com/a/21950971
