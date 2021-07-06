@@ -3,7 +3,7 @@ from functools import wraps
 from jupyterhub.services.auth import HubAuth
 import os
 
-from store import QuestionsStore
+from .store import QuestionsStore
 
 class SetEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -19,8 +19,8 @@ auth = HubAuth(api_token=os.environ['JUPYTERHUB_API_TOKEN'],
                cache_max_age=60)
 
 app = Flask(__name__,
-            template_folder='../client/templates',
-            static_folder='../client/public', static_url_path=prefix)
+            template_folder='templates.dir',
+            static_folder='public.dir', static_url_path=prefix)
 questions_store = QuestionsStore()
 
 def route(path, *args, **kw):
