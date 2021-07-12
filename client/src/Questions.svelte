@@ -88,7 +88,7 @@
     {#each $queryResult.data.filter(filterQuestions).sort(sortQuestions) as question (question.id)}
       <Question {...question} />
     {:else}
-      <span class="message">No {showClosed ? 'closed': 'open'} questions</span>
+      <span class="message">No {showClosed ? 'closed' : 'open'} questions</span>
     {/each}
   {/if}
 </div>
