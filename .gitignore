@@ -1,5 +1,6 @@
 dist/*
 server/jhqb.egg-info/*
+jhqb_store/*
 jupyterhub.sqlite
 jupyterhub_cookie_secret
 jupyterhub-proxy.pid

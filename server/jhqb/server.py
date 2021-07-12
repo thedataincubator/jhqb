@@ -14,6 +14,7 @@ class SetEncoder(json.JSONEncoder):
 Flask.json_encoder = SetEncoder
 
 prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '/')
+store_path = os.environ.get('JHQB_STORE', '/tmp')
 auth = HubAuth(api_token=os.environ['JUPYTERHUB_API_TOKEN'],
                api_url=os.environ['JUPYTERHUB_API_URL'],
                cache_max_age=60)
@@ -21,7 +22,7 @@ auth = HubAuth(api_token=os.environ['JUPYTERHUB_API_TOKEN'],
 app = Flask(__name__,
             template_folder='templates.dir',
             static_folder='public.dir', static_url_path=prefix)
-questions_store = QuestionsStore()
+questions_store = QuestionsStore(store_path)
 
 def route(path, *args, **kw):
     return app.route(prefix + path, *args, **kw)
