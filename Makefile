@@ -13,5 +13,8 @@ server/jhqb/%.dir: $$(shell find client/$$* -type f)
 	cp -r client/$*/* $@
 	touch $@
 
-client/public/build/bundle.js: client/src/*.js client/src/*.svelte
+client/public/build/bundle.js: client/src/*.js client/src/*.svelte client/node_modules
 	cd client && npm run build
+
+client/node_modules: client/package.json
+	cd client && npm install
